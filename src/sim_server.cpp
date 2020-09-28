@@ -101,10 +101,12 @@ int main(int argc, char const *argv[]) {
 
     // prepare socket for req-rep
     zmq::socket_t socket(context, ZMQ_PAIR);
-    socket.connect("tcp://localhost:"+std::to_string(port_num));
+//    zmq::socket_t socket(context, ZMQ_REP);
+    socket.bind("tcp://0.0.0.0:"+std::to_string(port_num));
+//    socket.connect("tcp://0.0.0.0:"+std::to_string(port_num));
 
     while (1) {
-        // std::cout << "Sim server - map_exists is: " << sim.map_exists << std::endl;
+//         std::cout << "Sim server - map_exists is: " << sim.map_exists << std::endl;
         zmq::message_t message;
         // receive request
         socket.recv(&message);
@@ -121,7 +123,7 @@ int main(int argc, char const *argv[]) {
         bool success = sim_request_proto.ParseFromString(smessage);
         // TODO: what if failure
         int request_type = sim_request_proto.type();
-        // std::cout << "Sim server - request type: " << request_type << std::endl;
+//         std::cout << "Sim server - request type: " << request_type << std::endl;
         // update map or step sim
         if (request_type == 0) {
             // step
@@ -140,7 +142,7 @@ int main(int argc, char const *argv[]) {
                 // Sending response
                 socket.send(step_result);
             } else {
-                // std::cout << "Sim server - Stepping simulator." << std::endl;
+//                 std::cout << "Sim server - Stepping simulator." << std::endl;
                 std::vector<double> requested_vel;
                 for (auto &vel : sim_request_proto.step_request().requested_vel()) {
                     requested_vel.push_back(vel);
@@ -181,7 +183,7 @@ int main(int argc, char const *argv[]) {
                 memcpy(step_result.data(), sim_response_string.data(), sim_response_string.size());
                 // Send full obs response
                 socket.send(step_result);
-                // std::cout << "Sim server - sent back step result." << std::endl;
+//                 std::cout << "Sim server - sent back step result." << std::endl;
             }
         } else if (request_type == 1) {
             // update map

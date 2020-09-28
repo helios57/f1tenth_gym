@@ -86,6 +86,7 @@ WORKDIR /simulator
 
 EXPOSE 5557
 EXPOSE 5558
+EXPOSE 6666
 
 
 ENTRYPOINT ["/bin/bash"]
